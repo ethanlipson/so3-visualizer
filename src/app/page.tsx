@@ -1,24 +1,13 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import * as THREE from "three";
 import { Vector3 } from "three";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 
-function path(checkpoints: [Vector3, number][], t: number) {
-  let lastCheckpoint = 0;
-  for (let i = 1; i < checkpoints.length; i++) {
-    if (t >= checkpoints[i][1]) lastCheckpoint++;
-    else break;
-  }
-  t =
-    (t - checkpoints[lastCheckpoint][1]) /
-    (checkpoints[lastCheckpoint + 1][1] - checkpoints[lastCheckpoint][1]);
-
-  return checkpoints[lastCheckpoint][0].clone().lerp(checkpoints[lastCheckpoint + 1][0], t);
-}
-
 export default function Home() {
+  const progressBarRef = useRef<HTMLDivElement>(null);
+
   useEffect(() => {
     const width = window.innerWidth,
       height = window.innerHeight;
@@ -34,10 +23,10 @@ export default function Home() {
     const colors = new Float32Array(cubeGeometry.attributes.position.count * 3);
     const faceColors = [
       new THREE.Color(0xff0000), // Red
-      new THREE.Color(0x00ff00), // Green
+      new THREE.Color(0xff00ff), // Magenta
       new THREE.Color(0x0000ff), // Blue
       new THREE.Color(0xffff00), // Yellow
-      new THREE.Color(0xff00ff), // Magenta
+      new THREE.Color(0x00ff00), // Green
       new THREE.Color(0x00ffff), // Cyan
     ];
     for (let i = 0; i < 6; i++) {
@@ -72,13 +61,21 @@ export default function Home() {
     const topFaceMesh = new THREE.Line(topFaceGeometry, topFaceMaterial);
     scene.add(topFaceMesh);
 
-    const plusZGeometry = new THREE.BufferGeometry().setFromPoints([
+    const frontFaceGeometry = new THREE.BufferGeometry().setFromPoints([
       new Vector3(0, 0, 0),
       new Vector3(0, 0, 1),
     ]);
-    const plusZMaterial = new THREE.LineBasicMaterial({ color: 0x00ff00 });
-    const plusZMesh = new THREE.Line(plusZGeometry, plusZMaterial);
-    scene.add(plusZMesh);
+    const frontFaceMaterial = new THREE.LineBasicMaterial({ color: 0x00ff00 });
+    const frontFaceMesh = new THREE.Line(frontFaceGeometry, frontFaceMaterial);
+    scene.add(frontFaceMesh);
+
+    // const plusZGeometry = new THREE.BufferGeometry().setFromPoints([
+    //   new Vector3(0, 0, 0),
+    //   new Vector3(0, 0, 1),
+    // ]);
+    // const plusZMaterial = new THREE.LineBasicMaterial({ color: 0x00ff00 });
+    // const plusZMesh = new THREE.Line(plusZGeometry, plusZMaterial);
+    // scene.add(plusZMesh);
 
     const ambientLight = new THREE.AmbientLight(0xffffff); // Soft white light
     scene.add(ambientLight);
@@ -92,47 +89,53 @@ export default function Home() {
     controls.update();
 
     // animation
+    const pathDurationInMs = 5000;
 
     function animate(time: number) {
-      const prog = (time / 20000) % 1;
-      const iter = Math.floor(time / 20000);
-      console.log(prog);
+      const prog = (time / pathDurationInMs) % 1;
+      const iter = Math.floor(time / pathDurationInMs);
 
-      const rot = path(
-        [
-          [new Vector3(0, 0, Math.PI), 0],
-          [
-            new Vector3(
-              Math.PI * Math.sin((iter / 10) * Math.PI),
-              0,
-              Math.PI * -Math.cos((iter / 10) * Math.PI)
-            ),
-            0.5,
-          ],
-          [
-            new Vector3(
-              Math.PI * -Math.sin((iter / 10) * Math.PI),
-              0,
-              Math.PI * Math.cos((iter / 10) * Math.PI)
-            ),
-            0.5,
-          ],
-          [new Vector3(0, 0, -Math.PI), 1],
-        ],
-        prog
-      );
+      let tiltAngle;
+      let rotAngle;
+      if (prog < 0.5) {
+        tiltAngle = ((iter / 5) * Math.PI) / 2;
+        rotAngle = prog * 2 * (Math.PI * 2);
+      } else {
+        tiltAngle = -((iter / 5) * Math.PI) / 2;
+        rotAngle = (prog - 0.5) * 2 * (Math.PI * 2);
+      }
+
+      const rot = new Vector3(
+        -Math.sin(tiltAngle),
+        Math.cos(tiltAngle),
+        0
+      ).multiplyScalar(rotAngle);
 
       cubeMesh.setRotationFromAxisAngle(rot.clone().normalize(), rot.length());
       axisMesh.geometry = new THREE.BufferGeometry().setFromPoints([
         new Vector3(0, 0, 0),
         rot.clone().normalize().multiplyScalar(1),
       ]);
-      topFaceMesh.setRotationFromAxisAngle(rot.clone().normalize(), rot.length());
+      topFaceMesh.setRotationFromAxisAngle(
+        rot.clone().normalize(),
+        rot.length()
+      );
+      frontFaceMesh.setRotationFromAxisAngle(
+        rot.clone().normalize(),
+        rot.length()
+      );
 
       controls.update();
       renderer.render(scene, camera);
+
+      progressBarRef.current!.style.width = `${prog * 100}%`;
     }
   }, []);
 
-  return <></>;
+  return (
+    <div
+      ref={progressBarRef}
+      className="absolute top-0 left-0 h-[0.3rem] bg-red-500 z-50"
+    />
+  );
 }
