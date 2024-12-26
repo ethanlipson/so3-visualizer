@@ -2,13 +2,13 @@
 
 Hosted at [https://so3-visualizer.vercel.app](https://so3-visualizer.vercel.app)
 
-The Lie group SO(3) is not simply connected; it is impossible to deform a 360-degree loop into the identity rotation. It is, however, possible to deform a 720-degree loop into the identity, as this website demonstrates. Topologically, this is because SO(3) is double-covered by the group of unit quaternions Spin(3), which is simply connected.
+The Lie group SO(3) is not simply connected; it is impossible to deform a 360-degree loop into the identity rotation. It is, however, possible to deform a 720-degree loop into the identity, as this website demonstrates. Topologically, this is because SO(3) is double-covered by the group of unit quaternions Spin(3), which is simply connected. It may seem like the sudden change in the axis of rotation is a discontinuity, but all axes of rotation are equivalent at the identity (which is where the switch occurs), so this is allowed.
 
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app), with [Three.js](https://threejs.org/) was used for the graphics.
+This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app), with [Three.js](https://threejs.org/) used for the graphics.
 
 ### Controls
 
-Drag to rotate the camera, although this can be disorienting. I feel the default orientation is the best for understanding what's going on.
+Drag to rotate the camera, although this can be disorienting. I feel the default orientation is best for understanding what's going on.
 
 ### Getting Started
 
