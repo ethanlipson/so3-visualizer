@@ -6,6 +6,10 @@ The Lie group SO(3) is not simply connected; it is impossible to deform a 360-de
 
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app), with [Three.js](https://threejs.org/) was used for the graphics.
 
+### Controls
+
+Drag to rotate the camera, although this can be disorienting. I feel the default orientation is the best for understanding what's going on.
+
 ### Getting Started
 
 First, run the development server:

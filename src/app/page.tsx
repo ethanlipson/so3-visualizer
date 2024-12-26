@@ -49,7 +49,7 @@ export default function Home() {
       new Vector3(0, 0, 0),
       new Vector3(0, 0, 0),
     ]);
-    const axisMaterial = new THREE.LineBasicMaterial({ color: 0xff0000 });
+    const axisMaterial = new THREE.LineBasicMaterial({ color: 0xffff00 });
     const axisMesh = new THREE.Line(axisGeometry, axisMaterial);
     scene.add(axisMesh);
 
@@ -68,6 +68,14 @@ export default function Home() {
     const frontFaceMaterial = new THREE.LineBasicMaterial({ color: 0x00ff00 });
     const frontFaceMesh = new THREE.Line(frontFaceGeometry, frontFaceMaterial);
     scene.add(frontFaceMesh);
+
+    const sideFaceGeometry = new THREE.BufferGeometry().setFromPoints([
+      new Vector3(0, 0, 0),
+      new Vector3(1, 0, 0),
+    ]);
+    const sideFaceMaterial = new THREE.LineBasicMaterial({ color: 0xff0000 });
+    const sideFaceMesh = new THREE.Line(sideFaceGeometry, sideFaceMaterial);
+    scene.add(sideFaceMesh);
 
     // const plusZGeometry = new THREE.BufferGeometry().setFromPoints([
     //   new Vector3(0, 0, 0),
@@ -92,17 +100,19 @@ export default function Home() {
     const pathDurationInMs = 5000;
 
     function animate(time: number) {
-      const prog = (time / pathDurationInMs) % 1;
       const iter = Math.floor(time / pathDurationInMs);
+      const prog = iter <= 10 ? (time / pathDurationInMs) % 1 : 0;
+      const totalAngle = 2 * Math.PI * Math.min(1, 2 - iter / 5);
+      const part2StartAngle = 2 * Math.PI * Math.max(0, iter / 5 - 1);
 
       let tiltAngle;
       let rotAngle;
       if (prog < 0.5) {
-        tiltAngle = ((iter / 5) * Math.PI) / 2;
-        rotAngle = prog * 2 * (Math.PI * 2);
+        tiltAngle = (Math.min(iter / 5, 1) * Math.PI) / 2;
+        rotAngle = prog * 2 * totalAngle;
       } else {
-        tiltAngle = -((iter / 5) * Math.PI) / 2;
-        rotAngle = (prog - 0.5) * 2 * (Math.PI * 2);
+        tiltAngle = -(Math.min(iter / 5, 1) * Math.PI) / 2;
+        rotAngle = (prog - 0.5) * 2 * totalAngle + part2StartAngle;
       }
 
       const rot = new Vector3(
@@ -121,6 +131,10 @@ export default function Home() {
         rot.length()
       );
       frontFaceMesh.setRotationFromAxisAngle(
+        rot.clone().normalize(),
+        rot.length()
+      );
+      sideFaceMesh.setRotationFromAxisAngle(
         rot.clone().normalize(),
         rot.length()
       );
