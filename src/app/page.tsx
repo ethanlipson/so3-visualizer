@@ -100,8 +100,10 @@ export default function Home() {
     const pathDurationInMs = 5000;
 
     function animate(time: number) {
-      const iter = Math.floor(time / pathDurationInMs);
-      const prog = iter <= 10 ? (time / pathDurationInMs) % 1 : 0;
+      const offsetTime = Math.max(0, time - 500);
+
+      const iter = Math.floor(offsetTime / pathDurationInMs);
+      const prog = iter <= 10 ? (offsetTime / pathDurationInMs) % 1 : 0;
       const totalAngle = 2 * Math.PI * Math.min(1, 2 - iter / 5);
       const part2StartAngle = 2 * Math.PI * Math.max(0, iter / 5 - 1);
 
